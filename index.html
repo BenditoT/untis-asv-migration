@@ -499,7 +499,7 @@ function LoginStatus({data,setData,cfg}){
   return html`
   <div class="main-header"><div><h1 class="main-title">Login-Status</h1><div class="main-subtitle">${loggedIn} von ${students.length} haben sich angemeldet</div></div></div>
   <div class="alert alert-warning"><b>Wichtig zur „Live-Abfrage":</b> Ein Direktabruf der WebUntis-API aus dem Browser wird i. d. R. durch CORS blockiert. Empfohlen: ein kleiner <b>Server-Proxy (Supabase Edge Function)</b>, den die App abfragt. Bis der steht, nutze den <b>CSV-Fallback</b> (WebUntis-Benutzerexport mit Spalte „letzte Anmeldung").</div>
-  <${Acc} title="Woher kommt die Benutzerliste mit „letzter Anmeldung"?" icon="ℹ️">
+  <${Acc} title="Woher kommt die Benutzerliste mit letzter Anmeldung?" icon="ℹ️">
     <ol>
       <li>In WebUntis (Browser) als <b>Administrator</b> anmelden.</li>
       <li><b>Administration → Benutzer</b> öffnen.</li>
@@ -810,7 +810,7 @@ function Anleitung(){
       <div class="note">Findet sich dort kein Export oder fehlt die externe ID, geht es alternativ über <b>Administration → Berichte</b> (Schülerliste als CSV/XLS). Die genauen Bezeichnungen können je nach WebUntis-Version leicht abweichen – im Zweifel die Vorschau prüfen.</div>
     <//>
 
-    <${Acc} title="2) Benutzerliste mit „letzter Anmeldung" exportieren (für Login-Status)" icon="🔑">
+    <${Acc} title="2) Benutzerliste mit letzter Anmeldung exportieren (für Login-Status)" icon="🔑">
       <ol>
         <li>Als Administrator anmelden.</li>
         <li>Menü <b>Administration → Benutzer</b> öffnen.</li>
