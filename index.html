@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KRS · Untis-Migrations-Zentrale (ASV-ID)</title>
+<meta name="theme-color" content="#4A6A83">
+<style>
+:root{
+  --krs-blau:#4A6A83;--krs-blau-dark:#354E62;--krs-blau-light:#E8EEF3;--krs-blau-lighter:#F4F7F9;
+  --krs-orange:#E87722;--krs-orange-dark:#C0611A;--krs-orange-light:#FDF2E8;
+  --krs-gelb:#F5B335;--krs-gelb-dark:#D89A22;--krs-gelb-light:#FEF7E6;
+  --success:#2B8A3E;--success-bg:#EBFBEE;--error:#C92A2A;--error-bg:#FFF5F5;
+  --bg:#F4F6F8;--bg-card:#FFFFFF;--bg-subtle:#F4F6F8;
+  --text:#1A2332;--text-muted:#5C6370;--text-light:#8A92A0;
+  --border:#DEE4EB;--border-strong:#C4CCD6;
+  --radius:12px;--radius-sm:8px;--radius-lg:16px;
+  --shadow-sm:0 1px 2px rgba(26,35,50,.04);--shadow:0 2px 8px rgba(26,35,50,.06);--shadow-lg:0 8px 24px rgba(26,35,50,.10);
+  --transition:.2s cubic-bezier(.4,0,.2,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);line-height:1.55;min-height:100vh}
+.app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+@media(max-width:900px){.app{grid-template-columns:1fr}.sidebar{display:none}.sidebar.open{display:block;position:fixed;z-index:60;width:260px}}
+.sidebar{background:var(--krs-blau-dark);color:#fff;padding:20px 0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar-header{padding:0 20px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.logo-badge{display:inline-flex;gap:3px;font-weight:900;font-size:20px;background:#fff;padding:6px 10px;border-radius:6px}
+.logo-badge .k{color:var(--krs-blau)}.logo-badge .r{color:var(--krs-orange)}.logo-badge .s{color:var(--krs-gelb)}
+.sidebar-title{font-size:13px;font-weight:700;opacity:.9;margin-top:10px}
+.sidebar-subtitle{font-size:11px;opacity:.6;margin-top:2px}
+.mode-pill{margin:14px 20px;padding:7px 12px;border-radius:6px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.mode-demo{background:rgba(232,119,34,.2);color:var(--krs-gelb)}
+.mode-live{background:rgba(43,138,62,.25);color:#8CE0A0}
+.nav-section{padding:6px 20px;font-size:10px;text-transform:uppercase;letter-spacing:.8px;opacity:.5;margin-top:14px;font-weight:700}
+.nav-item{padding:11px 20px;cursor:pointer;font-size:14px;display:flex;align-items:center;gap:10px;transition:all var(--transition);border-left:3px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,.05)}
+.nav-item.active{background:rgba(255,255,255,.1);border-left-color:var(--krs-gelb);font-weight:600}
+.nav-badge{margin-left:auto;background:var(--krs-orange);color:#fff;padding:1px 8px;border-radius:10px;font-size:11px;font-weight:700}
+.nav-badge.ok{background:var(--success)}
+.main{padding:24px;max-width:100%;overflow-x:hidden}
+.main-header{margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.main-title{font-size:24px;font-weight:700;margin:0;letter-spacing:-.4px}
+.main-subtitle{color:var(--text-muted);font-size:14px;margin-top:4px}
+.card{background:var(--bg-card);border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:var(--shadow-sm);border:1px solid var(--border)}
+.card h2{margin:0 0 14px;font-size:18px;font-weight:700}
+.card h3{margin:18px 0 8px;font-size:15px;font-weight:700}
+.muted{color:var(--text-muted);font-size:14px}
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px}
+.tile{background:#fff;padding:18px;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow-sm);transition:all var(--transition)}
+.tile.hl{border-color:var(--krs-blau);background:var(--krs-blau-lighter)}
+.tile.warn{border-color:var(--krs-orange);background:var(--krs-orange-light)}
+.tile.good{border-color:var(--success);background:var(--success-bg)}
+.tile-label{font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.tile-value{font-size:32px;font-weight:800;line-height:1}
+.tile-sub{font-size:13px;color:var(--text-muted);margin-top:4px}
+.progress-bar{margin-top:12px;height:8px;background:var(--bg-subtle);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:var(--krs-blau);transition:width .5s ease}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:all var(--transition);min-height:42px;white-space:nowrap}
+.btn-primary{background:var(--krs-blau);color:#fff}.btn-primary:hover:not(:disabled){background:var(--krs-blau-dark)}
+.btn-primary:disabled{background:var(--border);color:var(--text-light);cursor:not-allowed}
+.btn-accent{background:var(--krs-orange);color:#fff}.btn-accent:hover:not(:disabled){background:var(--krs-orange-dark)}
+.btn-accent:disabled{background:var(--border);color:var(--text-light);cursor:not-allowed}
+.btn-secondary{background:#fff;color:var(--krs-blau);border:2px solid var(--krs-blau)}.btn-secondary:hover{background:var(--krs-blau-light)}
+.btn-ghost{background:transparent;color:var(--text-muted);border:1px solid var(--border)}.btn-ghost:hover{background:var(--bg-subtle)}
+.btn-danger{background:var(--error);color:#fff}.btn-danger:hover{background:#A51E1E}
+.btn-small{padding:6px 12px;font-size:13px;min-height:34px}
+.btn-group{display:flex;gap:8px;flex-wrap:wrap}
+.table-wrapper{overflow-x:auto;background:#fff;border-radius:var(--radius);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--border)}
+th{background:var(--bg-subtle);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted)}
+tr:hover td{background:var(--bg-subtle)}
+.pill{display:inline-block;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:600}
+.pill-info{background:var(--krs-blau-light);color:var(--krs-blau-dark)}
+.pill-success{background:var(--success-bg);color:var(--success)}
+.pill-warning{background:var(--krs-gelb-light);color:var(--krs-gelb-dark)}
+.pill-error{background:var(--error-bg);color:var(--error)}
+.pill-muted{background:var(--bg-subtle);color:var(--text-muted)}
+.alert{padding:12px 14px;border-radius:var(--radius-sm);margin-bottom:14px;font-size:14px}
+.alert-info{background:var(--krs-blau-light);color:var(--krs-blau-dark);border-left:4px solid var(--krs-blau)}
+.alert-warning{background:var(--krs-gelb-light);color:var(--krs-gelb-dark);border-left:4px solid var(--krs-gelb)}
+.alert-success{background:var(--success-bg);color:var(--success);border-left:4px solid var(--success)}
+.alert-error{background:var(--error-bg);color:var(--error);border-left:4px solid var(--error)}
+.input-group{margin-bottom:14px}
+label{display:block;font-weight:600;font-size:13px;margin-bottom:6px}
+input,select{width:100%;padding:10px 12px;border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;background:#fff}
+input:focus,select:focus{outline:none;border-color:var(--krs-blau);box-shadow:0 0 0 3px rgba(74,106,131,.15)}
+.dropzone{border:2px dashed var(--border-strong);border-radius:var(--radius);padding:26px;text-align:center;color:var(--text-muted);cursor:pointer;transition:all var(--transition)}
+.dropzone:hover{border-color:var(--krs-blau);background:var(--krs-blau-lighter)}
+.step{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border)}
+.step:last-child{border-bottom:none}
+.step-num{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:var(--krs-blau);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.step-num.done{background:var(--success)}.step-num.todo{background:var(--border-strong)}
+.toast-wrap{position:fixed;bottom:20px;right:20px;z-index:2000;display:flex;flex-direction:column;gap:8px}
+.toast{padding:12px 16px;border-radius:var(--radius-sm);color:#fff;font-weight:600;font-size:14px;box-shadow:var(--shadow-lg);animation:slideIn .25s ease;max-width:360px}
+.toast.success{background:var(--success)}.toast.error{background:var(--error)}.toast.info{background:var(--krs-blau)}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.mobile-toggle{display:none;position:fixed;top:12px;left:12px;background:var(--krs-blau);color:#fff;padding:8px 12px;border-radius:6px;z-index:70;border:none;font-size:18px;cursor:pointer}
+@media(max-width:900px){.mobile-toggle{display:block}.main{padding:64px 16px 24px}}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.filter-bar input,.filter-bar select{width:auto;min-width:160px}
+.kv{display:grid;grid-template-columns:200px 1fr;gap:8px 16px;font-size:14px}
+.kv div:nth-child(odd){color:var(--text-muted);font-weight:600}
+code{background:var(--bg-subtle);padding:2px 6px;border-radius:4px;font-size:13px}
+/* === ACCORDION / INFO === */
+.acc{border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:10px;overflow:hidden;background:#fff}
+.acc-head{padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:600;background:var(--krs-blau-lighter)}
+.acc-head:hover{background:var(--krs-blau-light)}
+.acc-head .chev{margin-left:auto;transition:transform .2s;color:var(--krs-blau)}
+.acc.open .acc-head .chev{transform:rotate(90deg)}
+.acc-body{padding:14px 16px;border-top:1px solid var(--border);font-size:14px;line-height:1.6}
+.acc-body ol,.acc-body ul{margin:8px 0 10px 22px;padding:0}
+.acc-body li{margin:6px 0}
+.acc-body h4{margin:14px 0 6px;font-size:14px}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0}
+.flow-box{background:var(--krs-blau-lighter);border:1px solid var(--krs-blau);border-radius:8px;padding:10px 12px;font-size:13px;font-weight:600;color:var(--krs-blau-dark);text-align:center}
+.flow-box.cloud{background:var(--krs-gelb-light);border-color:var(--krs-gelb-dark);color:var(--krs-gelb-dark)}
+.flow-box small{display:block;font-weight:400;opacity:.8;margin-top:2px}
+.flow-arrow{color:var(--text-muted);font-weight:800;font-size:18px}
+.tag-local{background:var(--success-bg);color:var(--success);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}
+.tag-cloud{background:var(--krs-gelb-light);color:var(--krs-gelb-dark);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}
+.note{background:var(--krs-blau-lighter);border-left:4px solid var(--krs-blau);padding:10px 12px;border-radius:6px;margin:10px 0;font-size:13px}
+</style>
+</head>
+<body>
+<button class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+<div id="root"></div>
+<div class="toast-wrap" id="toasts"></div>
+
+<script type="module">
+import { h, render } from 'https://esm.sh/preact@10.19.3';
+import { useState, useEffect, useMemo } from 'https://esm.sh/preact@10.19.3/hooks';
+import htm from 'https://esm.sh/htm@3.1.1';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const html = htm.bind(h);
+
+/* ====================== SUPABASE (gemeinsame KRS-DB, fest eingebaut) ====================== */
+const SUPABASE_URL = 'https://ooejsfixxiuobrpqgfqm.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9vZWpzZml4eGl1b2JycHFnZnFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQ5MDYsImV4cCI6MjA4OTYwMDkwNn0.GbAv-sB4B8nNE3IPfiYIjbkMKs0Aq03c_-TUcmFY_5s';
+const ALLOWED_EMAIL_DOMAINS = ['realschule-schriesheim.de'];
+const ALLOWED_ADMIN_EMAILS = ['kotzan@gmail.com'];
+let _sb=null;
+function sb(){ if(!_sb) _sb=createClient(SUPABASE_URL, SUPABASE_ANON_KEY); return _sb; }
+
+/* ====================== TOAST ====================== */
+function toast(msg, type='info'){
+  const wrap=document.getElementById('toasts');
+  const el=document.createElement('div');
+  el.className='toast '+type; el.textContent=msg;
+  wrap.appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(()=>el.remove(),300);},5000);
+}
+
+/* ====================== CSV HELPERS ====================== */
+function detectDelim(line){ const c=(line.match(/;/g)||[]).length, k=(line.match(/,/g)||[]).length; return c>=k?';':','; }
+function parseCSV(text){
+  text=text.replace(/^﻿/,'');
+  const lines=text.split(/\r?\n/).filter(l=>l.trim().length);
+  if(!lines.length) return {headers:[],rows:[]};
+  const delim=detectDelim(lines[0]);
+  const split=(line)=>{ const out=[];let cur='';let q=false;
+    for(let i=0;i<line.length;i++){const ch=line[i];
+      if(ch==='"'){ if(q&&line[i+1]==='"'){cur+='"';i++;} else q=!q; }
+      else if(ch===delim&&!q){out.push(cur);cur='';}
+      else cur+=ch; }
+    out.push(cur); return out.map(s=>s.trim()); };
+  const headers=split(lines[0]).map(h=>h.toLowerCase());
+  const rows=lines.slice(1).map(split);
+  return {headers,rows,delim};
+}
+// flexible column finder — strips spaces, punctuation, parentheses; keeps umlauts
+function col(headers,...cands){
+  const norm=s=>(s||'').toLowerCase().replace(/[^a-z0-9äöüß]/g,'');
+  for(const cand of cands){
+    const nc=norm(cand);
+    const i=headers.findIndex(h=>norm(h).includes(nc));
+    if(i>=0) return i;
+  }
+  return -1;
+}
+function normName(s){ return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z]/g,''); }
+function normDate(s){ // -> YYYY-MM-DD
+  if(!s) return '';
+  s=s.trim();
+  let m=s.match(/^(\d{4})-(\d{2})-(\d{2})/); if(m) return m[1]+'-'+m[2]+'-'+m[3];
+  m=s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2,4})/);
+  if(m){let y=m[3];if(y.length===2)y='20'+y;return y+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0');}
+  return s;
+}
+function downloadFile(name,content,type='text/csv;charset=utf-8'){
+  const blob=new Blob([type.includes('csv')?'﻿'+content:content],{type});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+/* ====================== DATA SERVICE (Demo <-> Supabase) ====================== */
+const CFG_KEY='untis_mig_cfg_v1', DATA_KEY='untis_mig_data_v1';
+const DataService = {
+  cfg(){ try{return JSON.parse(localStorage.getItem(CFG_KEY))||{}}catch(e){return {}} },
+  saveCfg(c){ localStorage.setItem(CFG_KEY, JSON.stringify(c)); },
+  load(){ try{return JSON.parse(localStorage.getItem(DATA_KEY))||{students:[],asv:[]}}catch(e){return {students:[],asv:[]}} },
+  save(d){ localStorage.setItem(DATA_KEY, JSON.stringify(d)); },
+  reset(){ localStorage.removeItem(DATA_KEY); },
+
+  /* ---- AUTH ---- */
+  async session(){ const {data}=await sb().auth.getSession(); return data.session; },
+  async signIn(email,password){ return sb().auth.signInWithPassword({email,password}); },
+  async magicLink(email){ return sb().auth.signInWithOtp({email, options:{emailRedirectTo:location.href}}); },
+  async signOut(){ return sb().auth.signOut(); },
+  onAuth(cb){ return sb().auth.onAuthStateChange((_e,s)=>cb(s)); },
+
+  /* ---- CLOUD: NUR nicht-sensibler Login-Status ----
+     Tresor-Regel: Roster (Namen, Geburtsdaten, Eltern-Mails, ASV-/alte ID) bleibt LOKAL.
+     In die Cloud kommen ausschließlich: Benutzername, Klasse, eingeloggt-ja/nein, letzte Anmeldung. */
+  async tablesExist(){
+    const {error}=await sb().from('untis_login_status').select('username').limit(1);
+    if(!error) return true;
+    if(error.code==='42P01') return false;   // undefined_table
+    throw error;
+  },
+  async pushStatus(students){
+    const rows=(students||[]).filter(s=>s.username).map(s=>({
+      username:s.username, klasse:s.klasse||null, login:!!s.login,
+      last_login:s.last_login?new Date(s.last_login).toISOString():null, updated_at:new Date().toISOString()
+    }));
+    if(!rows.length) return 0;
+    const {error}=await sb().from('untis_login_status').upsert(rows,{onConflict:'username'});
+    if(error) throw error;
+    return rows.length;
+  },
+  async pullStatus(){
+    const {data,error}=await sb().from('untis_login_status').select('*');
+    if(error) throw error;
+    return data||[];
+  }
+};
+function emailAllowed(email){
+  email=(email||'').toLowerCase();
+  if(ALLOWED_ADMIN_EMAILS.includes(email)) return true;
+  return ALLOWED_EMAIL_DOMAINS.some(d=>email.endsWith('@'+d));
+}
+
+/* ====================== MATCHING LOGIC ====================== */
+function buildMapping(students, asvList){
+  // index asv by old id and by name+date
+  const asvByOld={}, asvByKey={};
+  asvList.forEach(a=>{
+    if(a.old_id) asvByOld[String(a.old_id).trim()]=a;
+    const k=normName(a.last_name)+'|'+normName(a.first_name)+'|'+normDate(a.birth_date);
+    (asvByKey[k]=asvByKey[k]||[]).push(a);
+  });
+  return students.map(s=>{
+    const r={...s};
+    r.asv_id=''; r.match_status='missing_asv'; r.match_note='';
+    if(!s.old_external_id){ r.no_old_id=true; } else { r.no_old_id=false; }
+    // 1) match via old id
+    if(s.old_external_id && asvByOld[String(s.old_external_id).trim()]){
+      const a=asvByOld[String(s.old_external_id).trim()];
+      r.asv_id=a.asv_id; r.match_status='matched_id'; r.eltern1=a.eltern1; r.eltern2=a.eltern2; return r;
+    }
+    // 2) match via name+birthdate
+    const k=normName(s.last_name)+'|'+normName(s.first_name)+'|'+normDate(s.birth_date);
+    const hits=asvByKey[k]||[];
+    if(hits.length===1){ r.asv_id=hits[0].asv_id; r.match_status='matched_name'; r.eltern1=hits[0].eltern1; r.eltern2=hits[0].eltern2; }
+    else if(hits.length>1){ r.match_status='conflict'; r.match_note=hits.length+' ASV-Treffer (mehrdeutig)'; }
+    else { r.match_status='missing_asv'; r.match_note='kein ASV-Treffer'; }
+    return r;
+  });
+}
+const STATUS_META={
+  matched_id:{label:'ASV ✓ (ID)',pill:'pill-success'},
+  matched_name:{label:'ASV ✓ (Name)',pill:'pill-info'},
+  conflict:{label:'Konflikt',pill:'pill-error'},
+  missing_asv:{label:'ohne ASV-ID',pill:'pill-warning'},
+};
+
+/* ====================== DEMO DATA ====================== */
+function demoData(){
+  const students=[
+    {webuntis_internal_id:'1001',old_external_id:'ALT1001',last_name:'Müller',first_name:'Lena',birth_date:'12.03.2012',klasse:'7b',username:'muellele',login:true,last_login:'2026-06-18 19:42'},
+    {webuntis_internal_id:'1002',old_external_id:'ALT1002',last_name:'Schäfer',first_name:'Jonas',birth_date:'05.09.2011',klasse:'8a',username:'schaejo',login:true,last_login:'2026-06-17 08:10'},
+    {webuntis_internal_id:'1003',old_external_id:'ALT1003',last_name:'Weber',first_name:'Mia',birth_date:'21.01.2013',klasse:'6c',username:'webermi',login:false,last_login:''},
+    {webuntis_internal_id:'1004',old_external_id:'ALT1004',last_name:'Becker',first_name:'Tom',birth_date:'30.11.2010',klasse:'9a',username:'beckto',login:true,last_login:'2026-06-15 14:03'},
+    {webuntis_internal_id:'1005',old_external_id:'',last_name:'Hoffmann',first_name:'Sara',birth_date:'14.07.2012',klasse:'7b',username:'hoffsa',login:false,last_login:''},
+    {webuntis_internal_id:'1006',old_external_id:'ALT1006',last_name:'Wagner',first_name:'Lukas',birth_date:'02.02.2011',klasse:'8a',username:'wagnlu',login:false,last_login:''},
+    {webuntis_internal_id:'1007',old_external_id:'ALT1007',last_name:'Schmidt',first_name:'Anna',birth_date:'19.05.2013',klasse:'6c',username:'schmaa',login:true,last_login:'2026-06-18 07:55'},
+  ];
+  const asv=[
+    {asv_id:'a1f7c2e0-1111-4d4a-a716-000000000001',old_id:'ALT1001',last_name:'Müller',first_name:'Lena',birth_date:'2012-03-12',klasse:'7b',eltern1:'familie.mueller@example.de',eltern2:''},
+    {asv_id:'a1f7c2e0-1111-4d4a-a716-000000000002',old_id:'ALT1002',last_name:'Schäfer',first_name:'Jonas',birth_date:'2011-09-05',klasse:'8a',eltern1:'schaefer@example.de',eltern2:''},
+    {asv_id:'a1f7c2e0-1111-4d4a-a716-000000000003',old_id:'',last_name:'Weber',first_name:'Mia',birth_date:'2013-01-21',klasse:'6c',eltern1:'weber.fam@example.de',eltern2:'weber2@example.de'},
+    {asv_id:'a1f7c2e0-1111-4d4a-a716-000000000004',old_id:'',last_name:'Becker',first_name:'Tom',birth_date:'2010-11-30',klasse:'9a',eltern1:'becker@example.de',eltern2:''},
+    {asv_id:'a1f7c2e0-1111-4d4a-a716-000000000005',old_id:'',last_name:'Hoffmann',first_name:'Sara',birth_date:'2012-07-14',klasse:'7b',eltern1:'hoffmann@example.de',eltern2:''},
+    // Wagner Lukas hat KEINEN ASV-Eintrag -> missing_asv (Demo eines Problemfalls)
+    {asv_id:'a1f7c2e0-1111-4d4a-a716-000000000007',old_id:'ALT1007',last_name:'Schmidt',first_name:'Anna',birth_date:'2013-05-19',klasse:'6c',eltern1:'schmidt@example.de',eltern2:''},
+    // Zweite "Anna Schmidt" gleiches Geburtsdatum -> Konflikt-Demo, falls ALT1007 fehlte
+  ];
+  return {students,asv};
+}
+
+/* ====================== APP ====================== */
+function App(){
+  const [view,setView]=useState('dashboard');
+  const [data,setData]=useState(DataService.load());
+  const [cfg,setCfg]=useState(DataService.cfg());
+  const [session,setSession]=useState(null);
+  const [busy,setBusy]=useState(false);
+  const mode = session ? 'live' : 'demo';
+
+  useEffect(()=>{DataService.save(data);},[data]);
+  useEffect(()=>{DataService.saveCfg(cfg);},[cfg]);
+  useEffect(()=>{
+    DataService.session().then(s=>setSession(s)).catch(()=>{});
+    const sub=DataService.onAuth(s=>setSession(s));
+    return ()=>{ try{sub.data.subscription.unsubscribe();}catch(e){} };
+  },[]);
+
+  // NUR Login-Status (kein Roster-Klartext) — Roster bleibt lokal (Tresor-Regel)
+  const pullFromCloud=async()=>{
+    setBusy(true);
+    try{
+      const rows=await DataService.pullStatus();
+      const map={}; rows.forEach(r=>{ if(r.username) map[r.username.toLowerCase()]={login:!!r.login,last:r.last_login||''}; });
+      setData(d=>({...d,students:(d.students||[]).map(s=>{const h=map[(s.username||'').toLowerCase()];return h?{...s,login:h.login,last_login:h.last}:s;})}));
+      toast('Login-Status aus Cloud geladen ('+rows.length+')','success');
+    }catch(e){ toast(e.code==='42P01'?'Status-Tabelle fehlt — bitte SQL ausführen':'Laden fehlgeschlagen: '+(e.message||e.code),'error'); }
+    setBusy(false);
+  };
+  const pushToCloud=async()=>{
+    if(!confirm('Nur den Login-Status (Benutzername, Klasse, eingeloggt-ja/nein, letzte Anmeldung) in die Cloud schreiben?\n\nKeine Namen, Geburtsdaten, Eltern-Mails oder IDs — der Roster bleibt lokal.')) return;
+    setBusy(true);
+    try{ const n=await DataService.pushStatus(data.students); toast('Login-Status in Cloud gespeichert ('+n+')','success'); }
+    catch(e){ toast(e.code==='42P01'?'Status-Tabelle fehlt — bitte SQL ausführen':'Speichern fehlgeschlagen: '+(e.message||e.code),'error'); }
+    setBusy(false);
+  };
+
+  const mapped=useMemo(()=>buildMapping(data.students||[], data.asv||[]),[data]);
+  const stats=useMemo(()=>{
+    const total=mapped.length;
+    const ready=mapped.filter(m=>m.match_status==='matched_id'||m.match_status==='matched_name').length;
+    const conflicts=mapped.filter(m=>m.match_status==='conflict').length;
+    const noAsv=mapped.filter(m=>m.match_status==='missing_asv').length;
+    const noOld=mapped.filter(m=>m.no_old_id).length;
+    const loggedIn=(data.students||[]).filter(s=>s.login).length;
+    return {total,ready,conflicts,noAsv,noOld,loggedIn};
+  },[mapped,data]);
+
+  const nav=(id,label,badge,badgeOk)=>html`
+    <div class=${'nav-item'+(view===id?' active':'')} onClick=${()=>{setView(id);document.querySelector('.sidebar').classList.remove('open');}}>
+      <span>${label}</span>
+      ${badge!=null&&badge!==0?html`<span class=${'nav-badge'+(badgeOk?' ok':'')}>${badge}</span>`:''}
+    </div>`;
+
+  return html`
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-badge"><span class="k">K</span><span class="r">R</span><span class="s">S</span></div>
+        <div class="sidebar-title">Untis-Migrations-Zentrale</div>
+        <div class="sidebar-subtitle">Umzug auf die ASV-BW-Schüler-ID</div>
+      </div>
+      <div class=${'mode-pill '+(mode==='live'?'mode-live':'mode-demo')}>${mode==='live'?'● Supabase verbunden':'● Demo / lokal'}</div>
+      <div class="nav-section">Überblick</div>
+      ${nav('dashboard','📊 Dashboard')}
+      ${nav('overview','📋 Schülerübersicht',stats.total)}
+      ${nav('login','🔑 Login-Status',stats.loggedIn,true)}
+      <div class="nav-section">Migration</div>
+      ${nav('import','📥 Daten importieren')}
+      ${nav('conflicts','⚠️ Konflikte',stats.conflicts+stats.noAsv)}
+      ${nav('export','⬇️ Import-CSV erzeugen',stats.ready,true)}
+      <div class="nav-section">Hilfe</div>
+      ${nav('anleitung','📖 Anleitung')}
+      <div class="nav-section">System</div>
+      ${nav('admin','⚙️ Admin-Zentrale')}
+    </aside>
+    <main class="main">
+      <div style="display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+        ${session?html`
+          <span class="pill pill-success">● Supabase · ${session.user.email}</span>
+          <span class="pill pill-info" title="Roster bleibt lokal — Cloud nur für Login-Status">🔒 Roster lokal</span>
+          <button class="btn btn-secondary btn-small" disabled=${busy} onClick=${pullFromCloud}>⬇️ Status laden</button>
+          <button class="btn btn-accent btn-small" disabled=${busy} onClick=${pushToCloud}>⬆️ Status speichern</button>
+        `:html`<span class="pill pill-muted">● Lokal (nicht angemeldet)</span>`}
+      </div>
+      ${view==='dashboard'&&html`<${Dashboard} stats=${stats} mapped=${mapped} data=${data} setData=${setData} setView=${setView}/>`}
+      ${view==='overview'&&html`<${Overview} mapped=${mapped}/>`}
+      ${view==='login'&&html`<${LoginStatus} data=${data} setData=${setData} cfg=${cfg}/>`}
+      ${view==='import'&&html`<${ImportView} data=${data} setData=${setData}/>`}
+      ${view==='conflicts'&&html`<${Conflicts} mapped=${mapped} data=${data} setData=${setData}/>`}
+      ${view==='export'&&html`<${ExportView} mapped=${mapped} stats=${stats}/>`}
+      ${view==='admin'&&html`<${Admin} cfg=${cfg} setCfg=${setCfg} data=${data} setData=${setData} session=${session} pull=${pullFromCloud} push=${pushToCloud} busy=${busy}/>`}
+      ${view==='anleitung'&&html`<${Anleitung}/>`}
+    </main>
+  </div>`;
+}
+
+/* ---------- DASHBOARD ---------- */
+function Dashboard({stats,data,setData,setView}){
+  const pct=stats.total?Math.round(stats.ready/stats.total*100):0;
+  const loadDemo=()=>{ setData(demoData()); toast('Demo-Daten geladen','success'); };
+  return html`
+  <div class="main-header">
+    <div><h1 class="main-title">Dashboard</h1><div class="main-subtitle">Stand des ASV-ID-Umzugs auf einen Blick</div></div>
+    <div class="btn-group">
+      <button class="btn btn-secondary btn-small" onClick=${loadDemo}>Demo-Daten laden</button>
+      <button class="btn btn-primary btn-small" onClick=${()=>setView('import')}>Daten importieren</button>
+    </div>
+  </div>
+
+  ${stats.total===0?html`
+    <div class="alert alert-info">Noch keine Daten geladen. Starte mit <b>Daten importieren</b> (WebUntis-Schülerexport + ASV-Export) — oder klick <b>Demo-Daten laden</b>, um die App auszuprobieren.</div>`:''}
+
+  <div class="dash-grid">
+    <div class="tile hl"><div class="tile-label">Schüler gesamt</div><div class="tile-value">${stats.total}</div><div class="tile-sub">aus WebUntis</div></div>
+    <div class="tile good"><div class="tile-label">bereit für Export</div><div class="tile-value">${stats.ready}</div>
+      <div class="progress-bar"><div class="progress-fill" style=${'width:'+pct+'%'}></div></div>
+      <div class="tile-sub">${pct}% mit ASV-ID zugeordnet</div></div>
+    <div class=${'tile'+(stats.conflicts?' warn':'')}><div class="tile-label">Konflikte</div><div class="tile-value">${stats.conflicts}</div><div class="tile-sub">mehrdeutige Treffer</div></div>
+    <div class=${'tile'+(stats.noAsv?' warn':'')}><div class="tile-label">ohne ASV-ID</div><div class="tile-value">${stats.noAsv}</div><div class="tile-sub">kein ASV-Treffer</div></div>
+    <div class=${'tile'+(stats.noOld?' warn':'')}><div class="tile-label">ohne alte ID</div><div class="tile-value">${stats.noOld}</div><div class="tile-sub">brauchen Fallback</div></div>
+    <div class="tile"><div class="tile-label">eingeloggt</div><div class="tile-value">${stats.loggedIn}</div><div class="tile-sub">von ${stats.total} (Login-Status)</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Nächste Schritte</h2>
+    <div class="step"><div class=${'step-num '+(stats.total?'done':'todo')}>1</div><div><b>Bestand & ASV importieren</b><div class="muted">WebUntis-Schülerexport und ASV-BW-Export laden.</div></div></div>
+    <div class="step"><div class=${'step-num '+(stats.total&&stats.conflicts+stats.noAsv===0?'done':(stats.total?'todo':'todo'))}>2</div><div><b>Konflikte klären</b><div class="muted">${stats.conflicts+stats.noAsv} offene Fälle (Konflikte + ohne ASV-ID).</div></div></div>
+    <div class="step"><div class=${'step-num '+(stats.ready?'done':'todo')}>3</div><div><b>Import-CSV erzeugen</b><div class="muted">${stats.ready} Schüler bereit: alte ID → ASV-ID für den WebUntis-Import.</div></div></div>
+    <div class="step"><div class="step-num todo">4</div><div><b>In WebUntis importieren</b><div class="muted">Feldzuordnung: alte ID → „Schlüssel (extern, alt)", ASV-ID → „Schlüssel (extern)". Identifikation: „Schlüssel (extern, alt)".</div></div></div>
+  </div>`;
+}
+
+/* ---------- OVERVIEW ---------- */
+function Overview({mapped}){
+  const [q,setQ]=useState(''); const [klasse,setKlasse]=useState(''); const [st,setSt]=useState('');
+  const klassen=[...new Set(mapped.map(m=>m.klasse))].sort();
+  const rows=mapped.filter(m=>{
+    if(klasse&&m.klasse!==klasse) return false;
+    if(st&&m.match_status!==st) return false;
+    if(q){const s=(m.first_name+' '+m.last_name+' '+(m.username||'')+' '+(m.old_external_id||'')).toLowerCase();if(!s.includes(q.toLowerCase()))return false;}
+    return true;
+  });
+  return html`
+  <div class="main-header"><div><h1 class="main-title">Schülerübersicht</h1><div class="main-subtitle">${rows.length} von ${mapped.length} Schülern</div></div></div>
+  <div class="card">
+    <div class="filter-bar">
+      <input placeholder="Suche Name / Benutzer / alte ID" value=${q} onInput=${e=>setQ(e.target.value)}/>
+      <select value=${klasse} onChange=${e=>setKlasse(e.target.value)}><option value="">Alle Klassen</option>${klassen.map(k=>html`<option value=${k}>${k}</option>`)}</select>
+      <select value=${st} onChange=${e=>setSt(e.target.value)}>
+        <option value="">Alle Status</option>
+        <option value="matched_id">ASV ✓ (ID)</option><option value="matched_name">ASV ✓ (Name)</option>
+        <option value="conflict">Konflikt</option><option value="missing_asv">ohne ASV-ID</option>
+      </select>
+    </div>
+    ${rows.length===0?html`<div class="alert alert-info">Keine Treffer.</div>`:html`
+    <div class="table-wrapper"><table>
+      <thead><tr><th>Klasse</th><th>Name</th><th>Geburtsdatum</th><th>alte ID</th><th>ASV-ID</th><th>Login</th><th>Status</th></tr></thead>
+      <tbody>${rows.map(m=>html`<tr>
+        <td>${m.klasse}</td>
+        <td>${m.last_name}, ${m.first_name}</td>
+        <td>${normDate(m.birth_date)}</td>
+        <td>${m.old_external_id||html`<span class="pill pill-warning">fehlt</span>`}</td>
+        <td><code style="font-size:11px">${m.asv_id||'—'}</code></td>
+        <td>${m.login?html`<span class="pill pill-success">✓</span>`:html`<span class="pill pill-muted">–</span>`}</td>
+        <td><span class=${'pill '+(STATUS_META[m.match_status]?.pill||'pill-muted')}>${STATUS_META[m.match_status]?.label||m.match_status}</span></td>
+      </tr>`)}</tbody>
+    </table></div>`}
+  </div>`;
+}
+
+/* ---------- LOGIN STATUS ---------- */
+function LoginStatus({data,setData,cfg}){
+  const students=data.students||[];
+  const loggedIn=students.filter(s=>s.login).length;
+  const onCSV=(text)=>{
+    const {headers,rows}=parseCSV(text);
+    const iUser=col(headers,'benutzer','username','login','kürzel','kuerzel');
+    const iLast=col(headers,'letzteanmeldung','lastlogin','letzterlogin','anmeldung','lastseen');
+    if(iUser<0){toast('Spalte Benutzername nicht gefunden','error');return;}
+    const map={}; rows.forEach(r=>{const u=(r[iUser]||'').trim().toLowerCase();if(u)map[u]={last:iLast>=0?(r[iLast]||'').trim():''};});
+    // eingeloggt = es gibt einen Eintrag "letzte Anmeldung"; ohne Datum gilt als noch nicht eingeloggt
+    const upd=students.map(s=>{const hit=map[(s.username||'').toLowerCase()];return hit?{...s,login:!!hit.last,last_login:hit.last}:s;});
+    setData({...data,students:upd});
+    toast('Login-Status aus CSV aktualisiert','success');
+  };
+  const tryApi=async()=>{
+    if(!cfg.webuntisProxyUrl){toast('Kein Proxy-Endpunkt konfiguriert (Admin-Zentrale)','error');return;}
+    toast('Frage Login-Status ab …','info');
+    try{
+      const res=await fetch(cfg.webuntisProxyUrl,{method:'GET'});
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const json=await res.json(); // erwartet: [{username,lastLogin}]
+      const map={};(json||[]).forEach(x=>{if(x.username)map[String(x.username).toLowerCase()]={last:x.lastLogin||''};});
+      const upd=students.map(s=>{const hit=map[(s.username||'').toLowerCase()];return hit?{...s,login:!!hit.last,last_login:hit.last}:s;});
+      setData({...data,students:upd}); toast('Login-Status live aktualisiert','success');
+    }catch(e){ toast('Live-Abruf fehlgeschlagen: '+e.message+' — bitte CSV-Fallback nutzen','error'); }
+  };
+  return html`
+  <div class="main-header"><div><h1 class="main-title">Login-Status</h1><div class="main-subtitle">${loggedIn} von ${students.length} haben sich angemeldet</div></div></div>
+  <div class="alert alert-warning"><b>Wichtig zur „Live-Abfrage":</b> Ein Direktabruf der WebUntis-API aus dem Browser wird i. d. R. durch CORS blockiert. Empfohlen: ein kleiner <b>Server-Proxy (Supabase Edge Function)</b>, den die App abfragt. Bis der steht, nutze den <b>CSV-Fallback</b> (WebUntis-Benutzerexport mit Spalte „letzte Anmeldung").</div>
+  <${Acc} title="Woher kommt die Benutzerliste mit „letzter Anmeldung"?" icon="ℹ️">
+    <ol>
+      <li>In WebUntis (Browser) als <b>Administrator</b> anmelden.</li>
+      <li><b>Administration → Benutzer</b> öffnen.</li>
+      <li><b>Berichte</b> wählen und als <b>CSV</b> exportieren (gibt es als PDF/CSV/XLS).</li>
+      <li>Enthalten: <b>Benutzername</b> und – je nach Version – <b>„letzte Anmeldung"</b>. Datei hier unten einlesen.</li>
+    </ol>
+    <div class="note">Ist keine „letzte Anmeldung"-Spalte vorhanden, hilft später der Edge-Function-Proxy. Details im Menüpunkt <b>📖 Anleitung</b>.</div>
+  <//>
+
+  <div class="card">
+    <h2>Status aktualisieren</h2>
+    <div class="btn-group">
+      <button class="btn btn-primary" onClick=${tryApi}>🔄 Live abfragen (Proxy)</button>
+      <label class="btn btn-secondary" style="cursor:pointer">📥 WebUntis-Export-CSV einlesen
+        <input type="file" accept=".csv" style="display:none" onChange=${e=>{const f=e.target.files[0];if(f){const r=new FileReader();r.onload=()=>onCSV(r.result);r.readAsText(f,'utf-8');}}}/>
+      </label>
+    </div>
+    <p class="muted" style="margin-top:10px">Erwartete Spalten im CSV: <code>Benutzername</code> und <code>letzte Anmeldung</code> (Bezeichnungen werden flexibel erkannt).</p>
+  </div>
+  <div class="card">
+    <h2>Wer hat sich noch nicht angemeldet?</h2>
+    ${students.length===0?html`<div class="alert alert-info">Noch keine Schülerdaten geladen.</div>`:html`
+    <div class="table-wrapper"><table>
+      <thead><tr><th>Klasse</th><th>Name</th><th>Benutzer</th><th>Login</th><th>letzte Anmeldung</th></tr></thead>
+      <tbody>${students.slice().sort((a,b)=>(a.login-b.login)||a.klasse.localeCompare(b.klasse)).map(s=>html`<tr>
+        <td>${s.klasse}</td><td>${s.last_name}, ${s.first_name}</td><td>${s.username||'—'}</td>
+        <td>${s.login?html`<span class="pill pill-success">✓ eingeloggt</span>`:html`<span class="pill pill-error">offen</span>`}</td>
+        <td>${s.last_login||'—'}</td>
+      </tr>`)}</tbody>
+    </table></div>`}
+  </div>`;
+}
+
+/* ---------- IMPORT ---------- */
+function ImportView({data,setData}){
+  const importWebUntis=(text)=>{
+    const {headers,rows}=parseCSV(text);
+    const iId=col(headers,'schlüsselextern','schluesselextern','externerschlüssel','externid','externalid','id');
+    const iLast=col(headers,'familienname','nachname','lastname','name');
+    const iFirst=col(headers,'vorname','firstname','rufname');
+    const iBirth=col(headers,'geburtsdatum','birthdate','geburt');
+    const iClass=col(headers,'klasse','class');
+    const iUser=col(headers,'benutzername','username','login','kürzel','kuerzel');
+    const iInt=col(headers,'interneid','internalid','id');
+    if(iLast<0||iFirst<0){toast('Spalten Name/Vorname nicht gefunden','error');return;}
+    const students=rows.map((r,n)=>({
+      webuntis_internal_id:iInt>=0?(r[iInt]||'').trim():String(n+1),
+      old_external_id:iId>=0?(r[iId]||'').trim():'',
+      last_name:(r[iLast]||'').trim(), first_name:(r[iFirst]||'').trim(),
+      birth_date:iBirth>=0?(r[iBirth]||'').trim():'', klasse:iClass>=0?(r[iClass]||'').trim():'',
+      username:iUser>=0?(r[iUser]||'').trim():'', login:false, last_login:''
+    })).filter(s=>s.last_name);
+    setData({...data,students});
+    toast(students.length+' WebUntis-Schüler importiert','success');
+  };
+  const importASV=(text)=>{
+    const {headers,rows}=parseCSV(text);
+    const iAsv=col(headers,'asvid','schülerid','schuelerid','asv','id');
+    const iOld=col(headers,'alteid','altschlüssel','altschluessel','oldid','schuldatei','altekennung');
+    const iLast=col(headers,'familienname','nachname','lastname','name');
+    const iFirst=col(headers,'vorname','rufname','firstname');
+    const iBirth=col(headers,'geburtsdatum','birthdate','geburt');
+    const iClass=col(headers,'klasse','class');
+    const iE1=col(headers,'eltern1email','erziehungsberechtigte1email','eltern1mail','email1','elternemail','email');
+    const iE2=col(headers,'eltern2email','erziehungsberechtigte2email','eltern2mail','email2','weitereemail');
+    if(iAsv<0){toast('Spalte ASV-ID nicht gefunden','error');return;}
+    const asv=rows.map(r=>({
+      asv_id:(r[iAsv]||'').trim(), old_id:iOld>=0?(r[iOld]||'').trim():'',
+      last_name:(r[iLast]||'').trim(), first_name:(r[iFirst]||'').trim(),
+      birth_date:iBirth>=0?(r[iBirth]||'').trim():'', klasse:iClass>=0?(r[iClass]||'').trim():'',
+      eltern1:iE1>=0?(r[iE1]||'').trim():'', eltern2:iE2>=0?(r[iE2]||'').trim():''
+    })).filter(a=>a.asv_id);
+    setData({...data,asv});
+    toast(asv.length+' ASV-Datensätze importiert','success');
+  };
+  const fileBtn=(label,fn,accent)=>html`
+    <label class=${'btn '+(accent?'btn-accent':'btn-primary')} style="cursor:pointer">${label}
+      <input type="file" accept=".csv" style="display:none" onChange=${e=>{const f=e.target.files[0];if(f){const r=new FileReader();r.onload=()=>fn(r.result);r.readAsText(f,'utf-8');e.target.value='';}}}/>
+    </label>`;
+  return html`
+  <div class="main-header"><div><h1 class="main-title">Daten importieren</h1><div class="main-subtitle">CSV-Dateien werden nur lokal im Browser verarbeitet – kein Upload</div></div></div>
+  <${Acc} title="Woher bekomme ich diese CSV-Dateien? (WebUntis im Browser, nicht App)" icon="ℹ️">
+    <h4>WebUntis-Schülerexport</h4>
+    <ol>
+      <li>Im <b>Browser</b> bei WebUntis als <b>Administrator</b> anmelden (nicht die Mobile-App).</li>
+      <li><b>Stammdaten → Schüler*innen</b> öffnen; Feld <b>„Schlüssel (extern)"</b> (= alte ID) einblenden.</li>
+      <li>Über das <b>Export-Symbol</b> als <b>CSV</b> herunterladen (Schlüssel extern, Nachname, Vorname, Geburtsdatum, Klasse, Benutzername).</li>
+    </ol>
+    <h4>ASV-BW-Export</h4>
+    <ol><li><b>Datei → Verwaltung → Exportformatbibliothek</b>, Datenbereich <b>Schüler</b>, CSV mit <b>dauerhafter</b> ASV-ID, Name, Geburtsdatum, Klasse, Eltern-Mails.</li></ol>
+    <div class="note">Volle Schritt-für-Schritt-Anleitung mit allen Klicks: Menüpunkt <b>📖 Anleitung</b>.</div>
+  <//>
+  <div class="card">
+    <h2>1. WebUntis-Schülerexport</h2>
+    <p class="muted">Export aus WebUntis mit alter externer ID, Name, Vorname, Geburtsdatum, Klasse, Benutzername. Spaltennamen werden flexibel erkannt.</p>
+    ${fileBtn('📥 WebUntis-CSV wählen',importWebUntis)}
+    <span class="muted" style="margin-left:10px">${(data.students||[]).length} geladen</span>
+  </div>
+  <div class="card">
+    <h2>2. ASV-BW-Export</h2>
+    <p class="muted">Export mit <b>dauerhafter</b> ASV-Schüler-ID, Name, Vorname, Geburtsdatum, Klasse, Eltern-Mails – optional die alte Schuldatei-ID (macht das Mapping eindeutig).</p>
+    ${fileBtn('📥 ASV-CSV wählen',importASV,true)}
+    <span class="muted" style="margin-left:10px">${(data.asv||[]).length} geladen</span>
+  </div>
+  <div class="card">
+    <h2>Vorlagen herunterladen</h2>
+    <div class="btn-group">
+      <button class="btn btn-ghost btn-small" onClick=${()=>downloadFile('vorlage_webuntis_schueler.csv','Schlüssel (extern);Familienname;Vorname;Geburtsdatum;Klasse;Benutzername\nALT1001;Müller;Lena;12.03.2012;7b;muellele\n')}>WebUntis-Vorlage</button>
+      <button class="btn btn-ghost btn-small" onClick=${()=>downloadFile('vorlage_asv_export.csv','ASV-ID;alte_ID;Familienname;Vorname;Geburtsdatum;Klasse;Eltern1_Email;Eltern2_Email\na1f7c2e0-1111-4d4a-a716-000000000001;ALT1001;Müller;Lena;2012-03-12;7b;familie.mueller@example.de;\n')}>ASV-Vorlage</button>
+    </div>
+  </div>`;
+}
+
+/* ---------- CONFLICTS ---------- */
+function Conflicts({mapped,data,setData}){
+  const conflicts=mapped.filter(m=>m.match_status==='conflict'||m.match_status==='missing_asv'||m.no_old_id);
+  const setAsv=(internalId,val)=>{
+    // store manual override in students record as asv_override
+    const upd=(data.students||[]).map(s=>s.webuntis_internal_id===internalId?{...s,asv_override:val}:s);
+    setData({...data,students:upd});
+  };
+  // apply overrides into mapped view note: buildMapping doesn't use override; we surface override here
+  return html`
+  <div class="main-header"><div><h1 class="main-title">Konflikte & offene Fälle</h1><div class="main-subtitle">${conflicts.length} Fälle brauchen Aufmerksamkeit</div></div></div>
+  <div class="alert alert-info">Diese Schüler dürfen <b>nicht</b> in den alt→neu-Import, solange sie ungeklärt sind – sonst entstehen beim Import Neuanlagen oder Duplikate. Kläre sie manuell in ASV/WebUntis oder nimm sie aus dem Erstimport heraus.</div>
+  ${conflicts.length===0?html`<div class="card"><div class="alert alert-success">Keine offenen Konflikte. 🎉</div></div>`:html`
+  <div class="card"><div class="table-wrapper"><table>
+    <thead><tr><th>Klasse</th><th>Name</th><th>Geburtsdatum</th><th>alte ID</th><th>Problem</th><th>manuelle ASV-ID</th></tr></thead>
+    <tbody>${conflicts.map(m=>html`<tr>
+      <td>${m.klasse}</td><td>${m.last_name}, ${m.first_name}</td><td>${normDate(m.birth_date)}</td>
+      <td>${m.old_external_id||html`<span class="pill pill-warning">fehlt</span>`}</td>
+      <td>${m.no_old_id?html`<span class="pill pill-warning">ohne alte ID → Fallback</span> `:''}
+          ${m.match_status==='conflict'?html`<span class="pill pill-error">${m.match_note}</span>`:''}
+          ${m.match_status==='missing_asv'?html`<span class="pill pill-warning">kein ASV-Treffer</span>`:''}</td>
+      <td><input style="min-width:240px" placeholder="ASV-ID manuell eintragen" value=${(data.students.find(s=>s.webuntis_internal_id===m.webuntis_internal_id)||{}).asv_override||''} onChange=${e=>setAsv(m.webuntis_internal_id,e.target.value.trim())}/></td>
+    </tr>`)}</tbody>
+  </table></div>
+  <p class="muted" style="margin-top:10px">Manuell eingetragene ASV-IDs fließen in den Export ein (Spalte „manuelle ASV-ID" überschreibt das automatische Ergebnis).</p>
+  </div>`}`;
+}
+
+/* ---------- EXPORT ---------- */
+function ExportView({mapped,stats}){
+  const rowsForExport=mapped.map(m=>{
+    const data=DataService.load();
+    const ov=(data.students.find(s=>s.webuntis_internal_id===m.webuntis_internal_id)||{}).asv_override;
+    const asv=ov||m.asv_id;
+    return {...m,export_asv:asv};
+  }).filter(m=>m.export_asv && m.old_external_id);
+  const skipped=mapped.length-rowsForExport.length;
+  const buildCSV=()=>{
+    const head='old_external_id;new_external_id;last_name;first_name;birth_date;class';
+    const body=rowsForExport.map(m=>[m.old_external_id,m.export_asv,m.last_name,m.first_name,normDate(m.birth_date),m.klasse].join(';')).join('\n');
+    return head+'\n'+body+'\n';
+  };
+  return html`
+  <div class="main-header"><div><h1 class="main-title">Import-CSV erzeugen</h1><div class="main-subtitle">Für den WebUntis-Schülerimport (alte ID → ASV-ID)</div></div></div>
+  <div class="dash-grid">
+    <div class="tile good"><div class="tile-label">im Export</div><div class="tile-value">${rowsForExport.length}</div><div class="tile-sub">bereit & mit alter ID</div></div>
+    <div class=${'tile'+(skipped?' warn':'')}><div class="tile-label">nicht im Export</div><div class="tile-value">${skipped}</div><div class="tile-sub">ohne ASV-ID oder ohne alte ID</div></div>
+  </div>
+  <div class="card">
+    <h2>Auf Knopfdruck</h2>
+    <p class="muted">Die Datei enthält genau die Schüler, die sicher zugeordnet sind und eine alte ID haben. Konflikte/offene Fälle sind bewusst ausgeschlossen.</p>
+    <button class="btn btn-accent" disabled=${rowsForExport.length===0} onClick=${()=>{downloadFile('webuntis_asv_id_mapping_final.csv',buildCSV());toast(rowsForExport.length+' Zeilen exportiert','success');}}>⬇️ webuntis_asv_id_mapping_final.csv herunterladen</button>
+  </div>
+  <div class="card">
+    <h2>So importierst du die Datei in WebUntis</h2>
+    <div class="kv">
+      <div>old_external_id</div><div>→ Schlüssel (extern, alt)</div>
+      <div>new_external_id</div><div>→ Schlüssel (extern)</div>
+      <div>last_name / first_name</div><div>→ Familienname / Vorname</div>
+      <div>birth_date / class</div><div>→ Geburtsdatum / Klasse</div>
+      <div>Schüleridentifikation</div><div><b>Schlüssel (extern, alt)</b></div>
+      <div>Zeichensatz / Trennzeichen</div><div>UTF-8 / Semikolon · erste Zeile ignorieren</div>
+    </div>
+    <div class="alert alert-warning" style="margin-top:14px"><b>Abbruchregel:</b> Wenn die WebUntis-Vorschau Bestandskinder als <b>Neuanlage</b> zeigt oder Duplikate warnt → Import abbrechen, nicht importieren.</div>
+  </div>`;
+}
+
+/* ---------- ADMIN ---------- */
+function Admin({cfg,setCfg,data,setData,session,pull,push,busy}){
+  const [email,setEmail]=useState(session?.user?.email||'');
+  const [pw,setPw]=useState('');
+  const [proxy,setProxy]=useState(cfg.webuntisProxyUrl||'');
+  const [tblMsg,setTblMsg]=useState('');
+  const doLogin=async()=>{
+    if(!emailAllowed(email)){toast('Diese E-Mail ist nicht freigegeben','error');return;}
+    const {error}=await DataService.signIn(email.trim(),pw);
+    if(error) toast('Login fehlgeschlagen: '+error.message,'error'); else toast('Angemeldet','success');
+  };
+  const doMagic=async()=>{
+    if(!emailAllowed(email)){toast('Diese E-Mail ist nicht freigegeben','error');return;}
+    const {error}=await DataService.magicLink(email.trim());
+    if(error) toast('Fehler: '+error.message,'error'); else toast('Magic-Link gesendet — E-Mail prüfen','info');
+  };
+  const checkTables=async()=>{
+    try{ const ok=await DataService.tablesExist(); setTblMsg(ok?'✅ untis_-Tabellen vorhanden':'❌ untis_-Tabellen fehlen — SQL ausführen'); }
+    catch(e){ setTblMsg('⚠️ '+(e.message||e.code)); }
+  };
+  return html`
+  <div class="main-header"><div><h1 class="main-title">Admin-Zentrale</h1><div class="main-subtitle">Anmeldung, gemeinsame KRS-Datenbank, Daten</div></div></div>
+
+  <div class="card">
+    <h2>Gemeinsame KRS-Supabase — nur Login-Status</h2>
+    <div class="alert alert-warning">🔒 <b>Tresor-Regel:</b> Der Roster (Namen, Geburtsdaten, Eltern-Mails, ASV-/alte ID) bleibt <b>ausschließlich lokal</b> und wird nie in die Cloud geschrieben. In der Cloud liegt nur der nicht-sensible Login-Status (Benutzername, Klasse, eingeloggt ja/nein, letzte Anmeldung).</div>
+    ${session?html`
+      <div class="alert alert-success">Angemeldet als <b>${session.user.email}</b>. Datenbank: <code>ooejsfixxiuobrpqgfqm</code> · Tabelle <code>untis_login_status</code>.</div>
+      <div class="btn-group">
+        <button class="btn btn-secondary" disabled=${busy} onClick=${pull}>⬇️ Status laden</button>
+        <button class="btn btn-accent" disabled=${busy} onClick=${push}>⬆️ Status speichern</button>
+        <button class="btn btn-ghost" onClick=${checkTables}>Tabelle prüfen</button>
+        <button class="btn btn-ghost" onClick=${async()=>{await DataService.signOut();toast('Abgemeldet','info');}}>Abmelden</button>
+      </div>
+      ${tblMsg?html`<p class="muted" style="margin-top:10px">${tblMsg}</p>`:''}
+    `:html`
+      <div class="alert alert-info">Für die gemeinsame Datenbank mit deiner Schul-E-Mail (<code>@realschule-schriesheim.de</code>) oder als Admin anmelden. Ohne Anmeldung läuft alles lokal weiter.</div>
+      <div class="form-row">
+        <div class="input-group"><label>E-Mail</label><input type="email" value=${email} onInput=${e=>setEmail(e.target.value)} placeholder="name@realschule-schriesheim.de"/></div>
+        <div class="input-group"><label>Passwort</label><input type="password" value=${pw} onInput=${e=>setPw(e.target.value)} placeholder="••••••••"/></div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onClick=${doLogin}>Anmelden</button>
+        <button class="btn btn-ghost" onClick=${doMagic}>Magic-Link per E-Mail</button>
+      </div>
+    `}
+  </div>
+
+  <div class="card">
+    <h2>WebUntis-Login-Status (Proxy)</h2>
+    <p class="muted">Optionaler Endpunkt der Edge Function für den Live-Abruf. Bis er steht, CSV-Fallback im Bereich „Login-Status".</p>
+    <div class="input-group"><input value=${proxy} placeholder="https://ooejsfixxiuobrpqgfqm.supabase.co/functions/v1/webuntis-login" onInput=${e=>setProxy(e.target.value)}/></div>
+    <button class="btn btn-primary btn-small" onClick=${()=>{setCfg({...cfg,webuntisProxyUrl:proxy});toast('Gespeichert','success');}}>Speichern</button>
+  </div>
+
+  <div class="card">
+    <h2>Daten (lokaler Arbeitsstand)</h2>
+    <div class="kv"><div>WebUntis-Schüler</div><div>${(data.students||[]).length}</div><div>ASV-Datensätze</div><div>${(data.asv||[]).length}</div></div>
+    <div class="btn-group" style="margin-top:14px">
+      <button class="btn btn-ghost btn-small" onClick=${()=>{downloadFile('untis_mig_backup.json',JSON.stringify(data,null,2),'application/json');toast('Backup gespeichert','success');}}>Backup (JSON) sichern</button>
+      <button class="btn btn-danger btn-small" onClick=${()=>{if(confirm('Wirklich alle lokal geladenen Daten löschen? (Cloud bleibt unberührt)')){DataService.reset();setData({students:[],asv:[]});toast('Lokale Daten gelöscht','info');}}}>Lokale Daten löschen</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Datenschutz-Hinweis</h2>
+    <p class="muted">Der vollständige Roster bleibt nur im Browser (localStorage) und wird per WebUntis-Import-CSV verarbeitet — er verlässt das Gerät nicht. In die gemeinsame KRS-Supabase wandert ausschließlich der nicht-sensible Login-Status (<code>untis_login_status</code>, RLS, nur angemeldete Nutzer). Projektwoche-/Hub-Daten werden nicht berührt. Nach dem Rollout lokale Daten löschen.</p>
+  </div>`;
+}
+
+/* ---------- ACCORDION (Info-Aufklappbox) ---------- */
+function Acc({title,icon,children,open:openDefault}){
+  const [open,setOpen]=useState(!!openDefault);
+  return html`<div class=${'acc'+(open?' open':'')}>
+    <div class="acc-head" onClick=${()=>setOpen(!open)}><span>${icon||'ℹ️'}</span><span>${title}</span><span class="chev">▶</span></div>
+    ${open?html`<div class="acc-body">${children}</div>`:''}
+  </div>`;
+}
+
+/* ---------- ANLEITUNG (eigene Seite) ---------- */
+function Anleitung(){
+  return html`
+  <div class="main-header"><div><h1 class="main-title">📖 Anleitung & Erklärung</h1><div class="main-subtitle">Was die App macht, wie der ASV-Umzug funktioniert und woher die Daten kommen</div></div></div>
+
+  <div class="card">
+    <h2>Worum geht es? (in einfach)</h2>
+    <p>WebUntis erkennt jede Schülerin und jeden Schüler an einer unsichtbaren <b>Kennnummer</b>. Bisher war das die Nummer aus der <b>alten Schuldatei</b>. Künftig soll es die <b>dauerhafte ASV-BW-Schüler-ID</b> sein.</p>
+    <p>Der Trick: Wir <b>tauschen nur die Kennnummer aus</b> – wir legen die Konten <b>nicht neu an</b>. Dadurch bleiben Benutzername, Passwort, App und vor allem die <b>Elternzugänge mit allen Kindern</b> erhalten. WebUntis findet jedes Kind über die <i>alte</i> Nummer wieder und schreibt die <i>neue</i> ASV-ID hinein.</p>
+    <div class="note">Bild dazu: Es ist wie ein <b>Namensschild-Wechsel</b> an einer bestehenden Schublade – die Schublade (das Konto) mit allem Inhalt bleibt, nur das Etikett (die ID) wird neu beschriftet.</div>
+  </div>
+
+  <div class="card">
+    <h2>Wie die App arbeitet (der ganze Ablauf)</h2>
+    <div class="flow">
+      <div class="flow-box">1 · WebUntis-Export<small>alte ID + Namen</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">2 · ASV-Export<small>neue ASV-ID</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">3 · App matcht<small>alt ↔ neu</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">4 · Export-CSV<small>alte ID → ASV-ID</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">5 · Import in WebUntis<small>Kennung getauscht</small></div>
+    </div>
+    <p><span class="tag-local">lokal</span> Der komplette Datensatz (Namen, Geburtsdaten, Eltern-Mails, IDs) wird <b>nur in deinem Browser</b> verarbeitet und verlässt das Gerät nicht. <span class="tag-cloud">Cloud</span> In die gemeinsame KRS-Datenbank kommt <b>ausschließlich</b> der Login-Status (Benutzername, Klasse, eingeloggt ja/nein) – damit du siehst, wer sich schon angemeldet hat.</p>
+    <h3>Wie die App zuordnet (Matching)</h3>
+    <ol>
+      <li><b>Beste Methode:</b> über die <b>alte ID</b>, falls sie auch im ASV-Export steht → eindeutig.</li>
+      <li><b>Sonst:</b> über <b>Nachname + Vorname + Geburtsdatum</b> (Datumsformate werden automatisch angeglichen).</li>
+      <li>Gibt es mehrere Treffer (z. B. Zwillinge) → <b>Konflikt</b>, du klärst es manuell.</li>
+      <li>Kein Treffer → <b>ohne ASV-ID</b>, kommt nicht in den Export.</li>
+    </ol>
+    <p>Im <b>Export</b> landen nur sicher zugeordnete Kinder <b>mit alter ID</b>. Konflikte und offene Fälle werden bewusst ausgelassen – so kann der WebUntis-Import keine Dubletten anlegen.</p>
+  </div>
+
+  <div class="card">
+    <h2>Schritt für Schritt: Daten aus WebUntis holen</h2>
+    <div class="alert alert-warning">⚠️ Das geht nur in <b>WebUntis im Browser</b> (am PC, als <b>Administrator</b> angemeldet) – <b>nicht</b> in der Untis-Mobile-App. Die App kann keine Stammdaten exportieren.</div>
+
+    <${Acc} title="1) Schülerliste mit alter ID exportieren (fürs Mapping)" icon="📥" open=${true}>
+      <ol>
+        <li>Im Browser unter eurer WebUntis-Adresse (z. B. <code>webuntis.com</code> → Schule suchen) als <b>Administrator</b> anmelden.</li>
+        <li>Links im Menü <b>Stammdaten</b> öffnen, dann <b>Schüler*innen</b>.</li>
+        <li>Prüfen, dass das Feld <b>„Schlüssel (extern)"</b> gefüllt ist – das ist die <b>alte</b> Kennung, die wir zum Wiederfinden brauchen. (Spalten ggf. über das Zahnrad/Spaltenauswahl einblenden.)</li>
+        <li>Liste über das <b>Export-Symbol</b> der Seite als <b>CSV</b> (oder XLSX) herunterladen. Enthalten sein sollten: Schlüssel (extern), Nachname, Vorname, Geburtsdatum, Klasse, Benutzername.</li>
+        <li>Datei als <b>CSV UTF-8</b> speichern; ID-Spalten als <b>Text</b> behandeln (nicht von Excel umformatieren lassen).</li>
+      </ol>
+      <div class="note">Findet sich dort kein Export oder fehlt die externe ID, geht es alternativ über <b>Administration → Berichte</b> (Schülerliste als CSV/XLS). Die genauen Bezeichnungen können je nach WebUntis-Version leicht abweichen – im Zweifel die Vorschau prüfen.</div>
+    <//>
+
+    <${Acc} title="2) Benutzerliste mit „letzter Anmeldung" exportieren (für Login-Status)" icon="🔑">
+      <ol>
+        <li>Als Administrator anmelden.</li>
+        <li>Menü <b>Administration → Benutzer</b> öffnen.</li>
+        <li><b>Berichte</b> (Reports) wählen – diese gibt es als <b>PDF, CSV und XLS</b>.</li>
+        <li>Als <b>CSV</b> exportieren. Enthalten: <b>Benutzername</b> und – je nach Version – die Spalte <b>„letzte Anmeldung"/„letzter Login"</b>.</li>
+        <li>In dieser App unter <b>Login-Status → „WebUntis-Export-CSV einlesen"</b> hochladen.</li>
+      </ol>
+      <div class="note">Ob die Spalte „letzte Anmeldung" im Bericht enthalten ist, hängt von eurer WebUntis-Version ab. Ist sie nicht dabei, lässt sich der Live-Status später über einen kleinen Server-Proxy (Edge Function) abrufen.</div>
+    <//>
+
+    <${Acc} title="3) ASV-BW-Export mit dauerhafter Schüler-ID erstellen" icon="🏫">
+      <ol>
+        <li>In <b>ASV-BW</b> die <b>dauerhafte</b> Schüler-ID exportieren (36-stellig). <b>Nicht</b> die schuljahresbezogene ID aus dem Schülermodul.</li>
+        <li>Weg: <b>Datei → Verwaltung → Exportformatbibliothek</b>, Datenbereich <b>Schüler</b>, Format <b>CSV</b> (Semikolon, UTF-8).</li>
+        <li>Felder: ASV-Schüler-ID, Nachname, Vorname, Geburtsdatum, Klasse, Eltern-E-Mail(s) – optional die <b>alte Schuldatei-ID</b> (macht das Mapping eindeutig).</li>
+        <li>Klassen auswählen, Export starten, als CSV speichern.</li>
+      </ol>
+      <div class="note">Eine ausführliche Klick-Anleitung für ASV-BW liegt im Projektordner („ASV Live-Navigation").</div>
+    <//>
+
+    <${Acc} title="4) Fertige CSV zurück in WebUntis importieren (Kennung tauschen)" icon="⬆️">
+      <ol>
+        <li>In WebUntis: <b>Stammdaten → Schüler*innen → Import</b>.</li>
+        <li>Die von dieser App erzeugte <code>webuntis_asv_id_mapping_final.csv</code> hochladen.</li>
+        <li>Feldzuordnung: <b>old_external_id → Schlüssel (extern, alt)</b>, <b>new_external_id → Schlüssel (extern)</b>, dazu Name/Vorname/Geburtsdatum/Klasse.</li>
+        <li>Schüleridentifikation auf <b>„Schlüssel (extern, alt)"</b> stellen. Zeichensatz UTF-8, Trennzeichen Semikolon, erste Zeile ignorieren.</li>
+        <li><b>Vorschau genau prüfen.</b> Abbruchregel: Sobald Bestandskinder als <b>Neuanlage</b> erscheinen oder Dubletten gemeldet werden → <b>abbrechen</b>, nicht importieren.</li>
+      </ol>
+    <//>
+  </div>
+
+  <div class="card">
+    <h2>Reihenfolge in der App</h2>
+    <ol>
+      <li><b>Daten importieren</b>: WebUntis-CSV + ASV-CSV (bleiben lokal).</li>
+      <li><b>Dashboard</b>: sehen, wie viele zugeordnet sind.</li>
+      <li><b>Konflikte</b>: offene Fälle klären (manuelle ASV-ID möglich).</li>
+      <li><b>Import-CSV erzeugen</b>: Knopfdruck → Datei für WebUntis.</li>
+      <li><b>Login-Status</b>: Benutzerliste einlesen → sehen, wer sich angemeldet hat; optional in die Cloud schreiben.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>Häufige Fragen</h2>
+    <${Acc} title="Bleiben die Elternzugänge erhalten?" icon="❓">
+      Ja – solange die Schülerdatensätze nur aktualisiert (nicht neu angelegt) werden, bleiben Eltern-Kind-Verknüpfungen inkl. Geschwister bestehen. Das ist der Grund für den ID-Tausch statt Neuanlage. (In der Testgruppe einmal praktisch bestätigen.)
+    <//>
+    <${Acc} title="Müssen Passwörter zurückgesetzt werden?" icon="❓">
+      Nein. Es findet kein Passwort-Reset statt. Benutzernamen und Passwörter bleiben unverändert.
+    <//>
+    <${Acc} title="Sind die Schülerdaten sicher?" icon="❓">
+      Der vollständige Datensatz bleibt lokal in deinem Browser und wird nur als Import-CSV für WebUntis ausgegeben. In die gemeinsame Cloud kommt nur der Login-Status (Benutzername, Klasse, eingeloggt ja/nein) – keine Namen, Geburtsdaten, Eltern-Mails oder IDs.
+    <//>
+    <${Acc} title="Was, wenn ein Kind keine alte ID hat?" icon="❓">
+      Dann findet WebUntis es nicht über die alte ID. Diese Kinder erscheinen in „Konflikte" als „ohne alte ID" und werden über den Name+Geburtsdatum-Weg separat behandelt – nicht in den alt→neu-Import mischen.
+    <//>
+  </div>`;
+}
+
+render(html`<${App}/>`, document.getElementById('root'));
+</script>
+</body>
+</html>
