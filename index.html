@@ -919,7 +919,35 @@ function Anleitung(){
   </div>`;
 }
 
-render(html`<${App}/>`, document.getElementById('root'));
+/* ---------- PIN-GATE (einfacher Pseudo-Schutz) ---------- */
+const PIN_HASH='acb13bbe8840a7b93da0a8794d56cfab9049aaf4cd63fc5b9567a18a2f3e192b';
+async function sha256(s){
+  const buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function PinGate({onOk}){
+  const [pin,setPin]=useState(''); const [err,setErr]=useState('');
+  const submit=async(e)=>{ if(e) e.preventDefault();
+    const h=await sha256(pin.trim());
+    if(h===PIN_HASH){ onOk(); } else { setErr('Falsche PIN'); setPin(''); }
+  };
+  return html`<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--krs-blau-dark);padding:20px">
+    <form onSubmit=${submit} style="background:#fff;padding:32px;border-radius:16px;box-shadow:var(--shadow-lg);width:300px;max-width:100%;text-align:center">
+      <div class="logo-badge" style="margin-bottom:16px"><span class="k">K</span><span class="r">R</span><span class="s">S</span></div>
+      <h2 style="margin:0 0 4px;font-size:18px">Untis-Migrations-Zentrale</h2>
+      <p class="muted" style="margin:0 0 16px;font-size:13px">Bitte PIN eingeben</p>
+      <input type="password" inputmode="numeric" autofocus value=${pin} onInput=${e=>{setPin(e.target.value);setErr('');}} placeholder="PIN" style="text-align:center;letter-spacing:6px;font-size:20px"/>
+      ${err?html`<div class="pill pill-error" style="margin-top:10px;display:inline-block">${err}</div>`:''}
+      <button class="btn btn-primary btn-full" style="margin-top:16px" type="submit">Entsperren</button>
+    </form>
+  </div>`;
+}
+function Root(){
+  const [ok,setOk]=useState(()=>{ try{return sessionStorage.getItem('untis_pin_ok')==='1';}catch(e){return false;} });
+  if(!ok) return html`<${PinGate} onOk=${()=>{ try{sessionStorage.setItem('untis_pin_ok','1');}catch(e){} setOk(true); }}/>`;
+  return html`<${App}/>`;
+}
+render(html`<${Root}/>`, document.getElementById('root'));
 </script>
 </body>
 </html>
