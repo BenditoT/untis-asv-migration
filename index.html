@@ -800,44 +800,93 @@ function Anleitung(){
     <div class="alert alert-warning">⚠️ Das geht nur in <b>WebUntis im Browser</b> (am PC, als <b>Administrator</b> angemeldet) – <b>nicht</b> in der Untis-Mobile-App. Die App kann keine Stammdaten exportieren.</div>
 
     <${Acc} title="1) Schülerliste mit alter ID exportieren (fürs Mapping)" icon="📥" open=${true}>
+      <h4>Voraussetzung</h4>
+      <ul>
+        <li>An einem <b>PC/Mac im Browser</b> (Chrome, Safari, Edge) – <b>nicht</b> in der Untis-App auf dem Handy.</li>
+        <li>Du bist mit einem <b>Administrator-Konto</b> angemeldet (ein normaler Lehrer-Account kann nicht exportieren).</li>
+      </ul>
+      <h4>Schritt für Schritt</h4>
       <ol>
-        <li>Im Browser unter eurer WebUntis-Adresse (z. B. <code>webuntis.com</code> → Schule suchen) als <b>Administrator</b> anmelden.</li>
-        <li>Links im Menü <b>Stammdaten</b> öffnen, dann <b>Schüler*innen</b>.</li>
-        <li>Prüfen, dass das Feld <b>„Schlüssel (extern)"</b> gefüllt ist – das ist die <b>alte</b> Kennung, die wir zum Wiederfinden brauchen. (Spalten ggf. über das Zahnrad/Spaltenauswahl einblenden.)</li>
-        <li>Liste über das <b>Export-Symbol</b> der Seite als <b>CSV</b> (oder XLSX) herunterladen. Enthalten sein sollten: Schlüssel (extern), Nachname, Vorname, Geburtsdatum, Klasse, Benutzername.</li>
-        <li>Datei als <b>CSV UTF-8</b> speichern; ID-Spalten als <b>Text</b> behandeln (nicht von Excel umformatieren lassen).</li>
+        <li>Browser öffnen, auf <code>webuntis.com</code> gehen. Ins Suchfeld den Schulnamen tippen (Kurpfalz-Realschule Schriesheim) und die Schule anklicken.</li>
+        <li>Mit <b>Benutzername + Passwort des Admin-Kontos</b> anmelden.</li>
+        <li>Ganz links in der <b>Seitenleiste</b> auf <b>Stammdaten</b> klicken.</li>
+        <li>Darunter <b>Schüler*innen</b> wählen → es erscheint die Schülerliste als Tabelle.</li>
+        <li>Spalten einblenden: Über der Tabelle das <b>Zahnrad- / Spalten-Symbol</b> anklicken und die Spalte <b>Schlüssel (extern)</b> aktivieren. Das ist die <b>alte ID</b>, die wir brauchen.</li>
+        <li>Kurz prüfen: Steht in dieser Spalte überall eine Nummer? Leere Felder = Kinder ohne alte ID (landen später in „Konflikte").</li>
+        <li>Exportieren: Über der Liste das <b>Export-/Download-Symbol</b> anklicken (oft ein Pfeil nach unten oder drei Punkte) und <b>CSV</b> wählen.</li>
+        <li>Die Datei liegt danach in deinem <b>Downloads-Ordner</b> (z. B. <code>schueler.csv</code>).</li>
       </ol>
-      <div class="note">Findet sich dort kein Export oder fehlt die externe ID, geht es alternativ über <b>Administration → Berichte</b> (Schülerliste als CSV/XLS). Die genauen Bezeichnungen können je nach WebUntis-Version leicht abweichen – im Zweifel die Vorschau prüfen.</div>
+      <h4>Diese Spalten müssen drin sein</h4>
+      <ul><li>Schlüssel (extern) · Nachname (Familienname) · Vorname · Geburtsdatum · Klasse · Benutzername</li></ul>
+      <div class="note"><b>Excel-Falle:</b> CSV <b>nicht</b> per Doppelklick öffnen/bearbeiten — Excel zerschießt lange IDs und Klassen wie 5.1. Am einfachsten: Datei gar nicht öffnen, direkt in diese App laden. Wenn du doch reinschauen willst: Excel → Reiter <b>Daten</b> → <b>Aus Text/CSV</b> → ID-Spalten als <b>Text</b> → wieder als <b>CSV UTF-8</b> speichern.</div>
+      <div class="note">Bezeichnungen können je WebUntis-Version leicht abweichen. Falls du keinen Export-Button findest: <b>Administration → Berichte</b> liefert die Schülerliste ebenfalls als CSV/XLS.</div>
     <//>
 
     <${Acc} title="2) Benutzerliste mit letzter Anmeldung exportieren (für Login-Status)" icon="🔑">
+      <h4>Wofür?</h4>
+      <p>Damit die App zeigt, <b>wer sich schon in WebUntis angemeldet hat</b>. Diese Info steht nur im Admin-Bericht, nicht in der normalen Schülerliste.</p>
+      <h4>Schritt für Schritt</h4>
       <ol>
-        <li>Als Administrator anmelden.</li>
-        <li>Menü <b>Administration → Benutzer</b> öffnen.</li>
-        <li><b>Berichte</b> (Reports) wählen – diese gibt es als <b>PDF, CSV und XLS</b>.</li>
-        <li>Als <b>CSV</b> exportieren. Enthalten: <b>Benutzername</b> und – je nach Version – die Spalte <b>„letzte Anmeldung"/„letzter Login"</b>.</li>
-        <li>In dieser App unter <b>Login-Status → „WebUntis-Export-CSV einlesen"</b> hochladen.</li>
+        <li>Im Browser als <b>Administrator</b> angemeldet sein.</li>
+        <li>Linke Seitenleiste unten: <b>Administration</b> (Zahnrad-Symbol) anklicken.</li>
+        <li>Punkt <b>Benutzer</b> wählen.</li>
+        <li>Bereich <b>Berichte</b> öffnen (gibt es als PDF, CSV und XLS).</li>
+        <li>Als <b>CSV</b> exportieren und herunterladen.</li>
       </ol>
-      <div class="note">Ob die Spalte „letzte Anmeldung" im Bericht enthalten ist, hängt von eurer WebUntis-Version ab. Ist sie nicht dabei, lässt sich der Live-Status später über einen kleinen Server-Proxy (Edge Function) abrufen.</div>
+      <h4>Diese Spalten sind wichtig</h4>
+      <ul><li><b>Benutzername</b> und — je nach Version — <b>letzte Anmeldung</b> (Datum/Uhrzeit).</li></ul>
+      <h4>In die App laden</h4>
+      <ol>
+        <li>Links in dieser App auf <b>🔑 Login-Status</b> klicken.</li>
+        <li>Button <b>WebUntis-Export-CSV einlesen</b> → die eben geladene Datei auswählen.</li>
+        <li>Die Liste zeigt dann je Person: eingeloggt ja/nein und wann.</li>
+      </ol>
+      <div class="note">Wenn dein Bericht keine Spalte „letzte Anmeldung" hat, liefert WebUntis dieses Feld in eurer Version nicht — eine echte Live-Abfrage ist dann nicht möglich. Sobald die Spalte da ist, liest die App sie aus der CSV.</div>
     <//>
 
     <${Acc} title="3) ASV-BW-Export mit dauerhafter Schüler-ID erstellen" icon="🏫">
+      <h4>Welche ID?</h4>
+      <p>Unbedingt die <b>dauerhafte</b> ASV-Schüler-ID (36 Stellen, mit Bindestrichen). <b>Nicht</b> die kurze, schuljahresbezogene ID aus dem Schülermodul.</p>
+      <h4>Exportformat anlegen</h4>
       <ol>
-        <li>In <b>ASV-BW</b> die <b>dauerhafte</b> Schüler-ID exportieren (36-stellig). <b>Nicht</b> die schuljahresbezogene ID aus dem Schülermodul.</li>
-        <li>Weg: <b>Datei → Verwaltung → Exportformatbibliothek</b>, Datenbereich <b>Schüler</b>, Format <b>CSV</b> (Semikolon, UTF-8).</li>
-        <li>Felder: ASV-Schüler-ID, Nachname, Vorname, Geburtsdatum, Klasse, Eltern-E-Mail(s) – optional die <b>alte Schuldatei-ID</b> (macht das Mapping eindeutig).</li>
-        <li>Klassen auswählen, Export starten, als CSV speichern.</li>
+        <li>In <b>ASV-BW</b> oben im Menü: <b>Datei → Verwaltung → Exportformatbibliothek</b>.</li>
+        <li>Bei <b>Datenbereich</b> den Eintrag <b>Schüler</b> wählen.</li>
+        <li><b>Neuer Datensatz</b> (weißes Blatt / grünes Plus), Name z. B. <code>KRS_WebUntis_Export</code>.</li>
+        <li>Ausgabe: Format <b>CSV</b>, Trennzeichen <b>Semikolon</b>, Zeichensatz <b>UTF-8</b>, Spaltenüberschriften <b>ja</b>.</li>
+        <li>Unter <b>Ausgewählte Felder</b> diese Felder hinzufügen (per Plus/Suche):
+          <ul>
+            <li>Klasse</li>
+            <li>Schüler Familienname</li>
+            <li>Schüler Rufname (oder Vornamen)</li>
+            <li>Schüler Geburtsdatum</li>
+            <li><b>dauerhafte Schüler-ID</b></li>
+            <li>Erziehungsberechtigte/r E-Mail (Elternteil 1)</li>
+            <li>weitere/r Erziehungsberechtigte/r E-Mail (Elternteil 2)</li>
+            <li>falls vorhanden: alte Schuldatei-ID</li>
+          </ul>
+        </li>
+        <li>Speichern. Dann <b>Datensätze für den Export auswählen</b> → Klassen markieren → alle Schüler auswählen.</li>
+        <li>Zieldatei setzen (z. B. <code>asv_export.csv</code>) und <b>Export starten</b>.</li>
       </ol>
-      <div class="note">Eine ausführliche Klick-Anleitung für ASV-BW liegt im Projektordner („ASV Live-Navigation").</div>
+      <div class="note">Eine ausführliche Klick-Anleitung exakt zu eurer ASV-Oberfläche liegt im Projektordner als „ASV Live-Navigation". Taucht die ID im Elternexport nicht auf, exportiere ID einerseits und Eltern+Geburtsdatum andererseits — die App führt beides über Name + Geburtsdatum zusammen.</div>
     <//>
 
     <${Acc} title="4) Fertige CSV zurück in WebUntis importieren (Kennung tauschen)" icon="⬆️">
+      <h4>Wo?</h4>
+      <p>In WebUntis: <b>Stammdaten → Schüler*innen</b> → Button <b>Import</b> (oben bei der Liste).</p>
+      <h4>Schritt für Schritt</h4>
       <ol>
-        <li>In WebUntis: <b>Stammdaten → Schüler*innen → Import</b>.</li>
-        <li>Die von dieser App erzeugte <code>webuntis_asv_id_mapping_final.csv</code> hochladen.</li>
-        <li>Feldzuordnung: <b>old_external_id → Schlüssel (extern, alt)</b>, <b>new_external_id → Schlüssel (extern)</b>, dazu Name/Vorname/Geburtsdatum/Klasse.</li>
-        <li>Schüleridentifikation auf <b>„Schlüssel (extern, alt)"</b> stellen. Zeichensatz UTF-8, Trennzeichen Semikolon, erste Zeile ignorieren.</li>
-        <li><b>Vorschau genau prüfen.</b> Abbruchregel: Sobald Bestandskinder als <b>Neuanlage</b> erscheinen oder Dubletten gemeldet werden → <b>abbrechen</b>, nicht importieren.</li>
+        <li>Die von dieser App erzeugte Datei <code>webuntis_asv_id_mapping_final.csv</code> hochladen.</li>
+        <li>Im Zuordnungs-Bildschirm die Spalten zuweisen:
+          <ul>
+            <li>old_external_id → <b>Schlüssel (extern, alt)</b></li>
+            <li>new_external_id → <b>Schlüssel (extern)</b></li>
+            <li>last_name → Familienname · first_name → Vorname · birth_date → Geburtsdatum · class → Klasse</li>
+          </ul>
+        </li>
+        <li>Schüleridentifikation auf <b>Schlüssel (extern, alt)</b> stellen. Zeichensatz <b>UTF-8</b>, Trennzeichen <b>Semikolon</b>, erste Zeile ignorieren.</li>
+        <li><b>Vorschau genau prüfen</b> — es dürfen nur <b>Aktualisierungen</b> erscheinen.</li>
+        <li><b>Abbruchregel:</b> Sobald Bestandskinder als <b>Neuanlage</b> erscheinen oder Dubletten gemeldet werden → <b>sofort abbrechen</b>, nicht importieren, und mir Bescheid geben.</li>
       </ol>
     <//>
   </div>
